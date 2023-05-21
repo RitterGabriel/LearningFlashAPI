@@ -2,6 +2,7 @@ from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import permissions
+from setup.permission import IsDeckOwner
 from .models import Deck, FlashCard
 from .serializers import DeckSerializer, FlashCardSerializer
 from datetime import datetime
@@ -15,13 +16,8 @@ def must_show_flashcard(flashcard):
     return flashcard.domain_level ** 2 <= datetime_variation.days
 
 
-class IsOwner(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.user.id == request.user.id
-
-
 class DeckViewSet(views.APIView):
-    permission_classes = [IsOwner, permissions.IsAuthenticated]
+    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     def get(self, request, id):
         deck = Deck.objects.get(id=id)
         self.check_object_permissions(request, deck)
@@ -47,7 +43,7 @@ class DecksViewSet(views.APIView):
     
 
 class FlashCardsViewSet(views.APIView):
-    permission_classes = [IsOwner, permissions.IsAuthenticated]
+    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
     def get(self, request, id):
         deck = Deck.objects.get(id=id)
@@ -69,7 +65,7 @@ class FlashCardsViewSet(views.APIView):
 
 
 class FlashCardViewSet(views.APIView):
-    permission_classes = [IsOwner, permissions.IsAuthenticated]
+    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
     def put(self, request, id):
         flash_card = FlashCard.objects.get(id=id)

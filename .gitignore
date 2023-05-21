@@ -1,2 +1,6 @@
 /.env
 /venv
+/decks/__pycache__
+/setup/__pycache__
+/users/__pycache__
+/summaries/__pycache__

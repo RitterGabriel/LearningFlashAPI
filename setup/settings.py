@@ -11,16 +11,17 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'decks',
-    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'decks',
+    'users',
+    'summaries',
 ]
 
 REST_FRAMEWORK = {
