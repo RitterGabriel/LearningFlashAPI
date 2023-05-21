@@ -15,8 +15,9 @@ class Summary(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     gender = models.ForeignKey(SummaryGender, on_delete=models.CASCADE)
     text_content = models.TextField(null=False)
+    translated_text = models.TextField(null=False)
 
 
 class Audio(models.Model):
     audio_name = models.CharField(max_length=255, unique=True, null=False)
-    audio_content = models.BinaryField()
+    audio_content = models.FileField(upload_to='audio_files/')

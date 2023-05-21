@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Author, Audio, Summary, SummaryGender
+from .models import Author, Audio, Summary, SummaryGender
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 class AudioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Audio
-        fields = ['audio_content']
+        fields = ['audio_name', 'audio_content']
 
 
 class SummarySerializer(serializers.ModelSerializer):
