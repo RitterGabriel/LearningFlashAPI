@@ -16,6 +16,8 @@ class AudioSerializer(serializers.ModelSerializer):
 
 
 class SummarySerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.author_name', read_only=True)
+    
     class Meta:
         model = Summary
         fields = '__all__'

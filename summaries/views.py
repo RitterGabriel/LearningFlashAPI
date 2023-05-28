@@ -2,6 +2,7 @@ from rest_framework import views
 from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from django.http import FileResponse
 from setup.permission import OnlyAdminCanPost
 from .models import Author, Audio, Summary, SummaryGender
 from .serializers import AuthorSerializer, Author, SummarySerializer, SummaryGenderSerializer, AudioSerializer
@@ -40,8 +41,10 @@ class AudioViewSet(views.APIView):
 
     def get(self, request, phrase):
         queryset = Audio.objects.get(audio_name=phrase)
-        serializer = AudioSerializer(queryset)
-        return Response(serializer.data, status=200)
+        print(queryset.audio_content)
+        response = FileResponse(queryset.audio_content.open(), content_type='audio/mpeg')
+        response['Content-Disposition'] = f'attachment; filename="{queryset.audio_content.name}"'
+        return response
 
 
 class SummariesViewSet(views.APIView):

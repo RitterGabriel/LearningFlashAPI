@@ -3,11 +3,17 @@ from django.db import models
 
 class Author(models.Model):
     author_name = models.CharField(max_length=150, null=False)
-    borned_at = models.DateField(null=False)
+    birth_date = models.DateField(null=False)
+
+    def __str__(self):
+        return self.author_name
 
 
 class SummaryGender(models.Model):
     gender_name = models.CharField(max_length=120, null=False)
+
+    def __str__(self):
+        return self.gender_name
 
 
 class Summary(models.Model):
@@ -17,7 +23,13 @@ class Summary(models.Model):
     text_content = models.TextField(null=False)
     translated_text = models.TextField(null=False)
 
+    def __str__(self):
+        return self.title
+
 
 class Audio(models.Model):
     audio_name = models.CharField(max_length=255, unique=True, null=False)
     audio_content = models.FileField(upload_to='audio_files/')
+
+    def __str__(self):
+        return self.audio_name

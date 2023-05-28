@@ -1,3 +1,8 @@
 from django.contrib import admin
+from summaries.models import Summary, SummaryGender, Audio, Author
 
-# Register your models here.
+
+admin.site.register(Summary)
+admin.site.register(SummaryGender)
+admin.site.register(Audio)
+admin.site.register(Author)
