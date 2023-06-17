@@ -15,13 +15,25 @@ class AudioSerializer(serializers.ModelSerializer):
         fields = ['audio_name', 'audio_content']
 
 
+class CreateSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Summary
+        fields = 'title', 'author', 'gender', 'text_content', 'translated_text'
+
+
+class SummariesSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='author.author_name', read_only=True)
+    gender = serializers.CharField(source='gender.gender_name', read_only=True)
+    class Meta:
+        model = Summary
+        fields = 'id', 'title', 'author', 'gender',
+
 class SummarySerializer(serializers.ModelSerializer):
-    author_name = serializers.CharField(source='author.author_name', read_only=True)
-    
+    author = serializers.CharField(source='author.author_name', read_only=True)
+    gender = serializers.CharField(source='gender.gender_name', read_only=True)
     class Meta:
         model = Summary
         fields = '__all__'
-        extra_kwargs = {'id': {'read_only': True}}
 
 
 class SummaryGenderSerializer(serializers.ModelSerializer):

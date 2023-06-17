@@ -18,6 +18,7 @@ def must_show_flashcard(flashcard):
 
 class DeckViewSet(views.APIView):
     permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
+    
     def get(self, request, id):
         deck = Deck.objects.get(id=id)
         self.check_object_permissions(request, deck)
@@ -27,6 +28,7 @@ class DeckViewSet(views.APIView):
 
 class DecksViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
+    
     def get(self, request):
         decks = Deck.objects.filter(user=request.user)
         serializer = DeckSerializer(decks, many=True)
@@ -46,30 +48,48 @@ class FlashCardsViewSet(views.APIView):
     permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
     def get(self, request, id):
-        deck = Deck.objects.get(id=id)
-        self.check_object_permissions(request, deck)
-        flashcards = filter(must_show_flashcard, FlashCard.objects.filter(deck=deck))
-        serializer = FlashCardSerializer(flashcards, many=True)
-        return Response(serializer.data, status=200)
-    
+        decks = Deck.objects.filter(id=id)
+        if len(decks) > 0:
+            deck = decks[0]
+            self.check_object_permissions(request, deck)
+            flashcards = filter(must_show_flashcard, FlashCard.objects.filter(deck=deck))
+            serializer = FlashCardSerializer(flashcards, many=True)
+            return Response(serializer.data, status=200)
+        return Response({'status': '404'}, status=404)
+
     def post(self, request, id):
         data = request.data
         data['deck'] = id
-        deck = Deck.objects.get(id=id)
-        self.check_object_permissions(request, deck)
-        serializer = FlashCardSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        decks = Deck.objects.filter(id=id)
+        if len(decks) > 0:
+            deck = decks[0]
+            self.check_object_permissions(request, deck)
+            serializer = FlashCardSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
+        return Response({'status': '404'}, status=404)
 
 
 class FlashCardViewSet(views.APIView):
     permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
     def put(self, request, id):
+        has_good_domain_level = request.data.get('has_good_domain_level')
+        if has_good_domain_level is None:
+            return Response({'has_good_domain_level': 'campo obrigatório'}, status=400)
         flash_card = FlashCard.objects.get(id=id)
-        serializer = FlashCardSerializer(flash_card, data=request.data)
+        data = {
+            'id': flash_card.id, 
+            'phrase': flash_card.phrase, 
+            'translated_phrase': flash_card.translated_phrase, 
+            'last_time_checked': datetime.now(),
+            'domain_level': flash_card.domain_level + 1 if has_good_domain_level else 0,
+            'deck': flash_card.deck.id,
+        }
+        
+        serializer = FlashCardSerializer(flash_card, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
