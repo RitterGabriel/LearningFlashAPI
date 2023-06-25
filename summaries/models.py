@@ -21,7 +21,6 @@ class Summary(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     gender = models.ForeignKey(SummaryGender, on_delete=models.CASCADE)
     text_content = models.TextField(null=False)
-    translated_text = models.TextField(null=False)
 
     def __str__(self):
         return self.title
@@ -33,3 +32,11 @@ class Audio(models.Model):
 
     def __str__(self):
         return self.audio_name
+
+
+class Phrase(models.Model):
+    phrase = models.CharField(max_length=255, null=False, unique=True)
+    translated_phrase = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return self.phrase

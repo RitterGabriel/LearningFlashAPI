@@ -1,8 +1,20 @@
 from django.urls import path
 from django.contrib import admin
-from decks.views import DecksViewSet, DeckViewSet, FlashCardsViewSet, FlashCardViewSet
 from users.views import UserViewSet, LoginViewSet
-from summaries.views import SummaryViewSet, SummariesViewSet, SummaryGenderViewSet, AudioViewSet, AuthorsViewSet
+from decks.views import (
+    DecksViewSet, 
+    DeckViewSet, 
+    FlashCardsViewSet, 
+    FlashCardViewSet
+)
+from summaries.views import (
+    SummaryView,
+    SummariesView, 
+    SummaryGenderView, 
+    AudioView, 
+    AuthorsView, 
+    PhraseView
+)
 
 
 urlpatterns = [
@@ -13,9 +25,10 @@ urlpatterns = [
     path('api/decks/<int:id>/', DeckViewSet.as_view()),
     path('api/decks/<int:id>/flashcards/', FlashCardsViewSet.as_view()),
     path('api/flashcards/<int:id>/', FlashCardViewSet.as_view()),
-    path('api/summaries/', SummariesViewSet.as_view()),
-    path('api/summaries/<int:id>/', SummaryViewSet.as_view()),
-    path('api/summary_genders/', SummaryGenderViewSet.as_view()),
-    path('api/authors/', AuthorsViewSet.as_view()),
-    path('api/audio/<str:phrase>', AudioViewSet.as_view()),
+    path('api/summaries/', SummariesView.as_view()),
+    path('api/summaries/<int:id>/', SummaryView.as_view()),
+    path('api/summary_genders/', SummaryGenderView.as_view()),
+    path('api/authors/', AuthorsView.as_view()),
+    path('api/audio/<str:phrase>', AudioView.as_view()),
+    path('api/phrases/<str:phrase>', PhraseView.as_view())
 ]

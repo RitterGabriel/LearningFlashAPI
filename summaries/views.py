@@ -3,11 +3,26 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from django.http import FileResponse
 from setup.permission import OnlyAdminCanPost
-from summaries.models import Author, Audio, Summary, SummaryGender
-from summaries.serializers import AuthorSerializer, Author, SummarySerializer, SummariesSerializer, CreateSummarySerializer, SummaryGenderSerializer, AudioSerializer
+from summaries.models import (
+    Author, 
+    Audio, 
+    Summary, 
+    SummaryGender, 
+    Phrase
+)
+from summaries.serializers import (
+    AuthorSerializer,
+    Author, 
+    SummarySerializer, 
+    SummariesSerializer, 
+    CreateSummarySerializer, 
+    SummaryGenderSerializer, 
+    AudioSerializer, 
+    PhraseSerializer
+)
 
 
-class AuthorsViewSet(views.APIView):
+class AuthorsView(views.APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def get(self, request):
@@ -23,7 +38,7 @@ class AuthorsViewSet(views.APIView):
         return Response(serializer.errors, status=400)
 
 
-class AudioViewSet(views.APIView):
+class AudioView(views.APIView):
     permission_classes = [OnlyAdminCanPost]
     parser_classes = [FileUploadParser]
      
@@ -46,7 +61,7 @@ class AudioViewSet(views.APIView):
         return response
 
 
-class SummariesViewSet(views.APIView):
+class SummariesView(views.APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def post(self, request):
@@ -62,14 +77,14 @@ class SummariesViewSet(views.APIView):
         return Response(serializer.data, status=200)
 
 
-class SummaryViewSet(views.APIView):
+class SummaryView(views.APIView):
     def get(self, request, id):
         queryset = Summary.objects.get(id=id)
         serializer = SummarySerializer(queryset)
         return Response(serializer.data, status=200)
 
 
-class SummaryGenderViewSet(views.APIView):
+class SummaryGenderView(views.APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def post(self, request):
@@ -83,3 +98,17 @@ class SummaryGenderViewSet(views.APIView):
         queryset = SummaryGender.objects.all()
         serializer = SummaryGenderSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
+
+
+class PhraseView(views.APIView):
+    def get(self, request, phrase):
+        phrase = ''.join(phrase.lower().split())
+        phrases = Phrase.objects.filter(phrase=phrase)
+        if len(phrases) > 0:
+            unformated_translated_phrase = phrases[0].translated_phrase
+            translated_phrase = ' '.join(unformated_translated_phrase.split('-')).capitalize()
+            data = {
+                'translated_phrase': translated_phrase
+            }
+            return Response(data, status=200)
+        return Response({'status': 404}, status=404)

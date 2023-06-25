@@ -10,12 +10,6 @@ from dateutil import parser
 import pytz
 
 
-def must_show_flashcard(flashcard):
-    last_time_checked = parser.parse(str(flashcard.last_time_checked)).replace(tzinfo=pytz.utc)
-    datetime_variation = datetime.now(pytz.utc) - last_time_checked
-    return flashcard.domain_level ** 2 <= datetime_variation.days
-
-
 class DeckViewSet(views.APIView):
     permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
@@ -25,6 +19,11 @@ class DeckViewSet(views.APIView):
         serializer = DeckSerializer(deck)
         return Response(serializer.data, status=200)
     
+    def delete(self, request, id):
+        deck = Deck.objects.filter(id=id)
+        deck.delete()
+        return Response(data={'status': 'deletado com sucesso'}, status=204)
+
 
 class DecksViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -47,12 +46,21 @@ class DecksViewSet(views.APIView):
 class FlashCardsViewSet(views.APIView):
     permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
     
+    @staticmethod
+    def must_show_flashcard(flashcard):
+        last_time_checked = parser.parse(str(flashcard.last_time_checked)).replace(tzinfo=pytz.utc)
+        datetime_variation = datetime.now(pytz.utc) - last_time_checked
+        return flashcard.domain_level ** 2 <= datetime_variation.days
+
     def get(self, request, id):
         decks = Deck.objects.filter(id=id)
         if len(decks) > 0:
             deck = decks[0]
             self.check_object_permissions(request, deck)
-            flashcards = filter(must_show_flashcard, FlashCard.objects.filter(deck=deck))
+            if request.GET.get('get_all') == 'false':
+                flashcards = filter(self.must_show_flashcard, FlashCard.objects.filter(deck=deck))
+            else:
+                flashcards = FlashCard.objects.filter(deck=deck)
             serializer = FlashCardSerializer(flashcards, many=True)
             return Response(serializer.data, status=200)
         return Response({'status': '404'}, status=404)
@@ -98,4 +106,4 @@ class FlashCardViewSet(views.APIView):
     def delete(self, request, id):
         flash_card = FlashCard.objects.filter(id=id) 
         flash_card.delete()
-        return Response(data={'status': 'deletado com sucesso'}, status=201)
+        return Response(data={'status': 'deletado com sucesso'}, status=204)
