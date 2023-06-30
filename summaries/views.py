@@ -102,13 +102,13 @@ class SummaryGenderView(views.APIView):
 
 class PhraseView(views.APIView):
     def get(self, request, phrase):
-        phrase = ''.join(phrase.lower().split())
-        phrases = Phrase.objects.filter(phrase=phrase)
+        query = ' '.join(phrase.split()).lower()
+        phrases = Phrase.objects.filter(phrase=query)
         if len(phrases) > 0:
-            unformated_translated_phrase = phrases[0].translated_phrase
-            translated_phrase = ' '.join(unformated_translated_phrase.split('-')).capitalize()
+            translated_phrase = phrases[0].translated_phrase
             data = {
-                'translated_phrase': translated_phrase
+                'phrase': phrase,
+                'translated_phrase': translated_phrase,
             }
             return Response(data, status=200)
         return Response({'status': 404}, status=404)
