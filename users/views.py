@@ -1,11 +1,11 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from rest_framework import views
 from rest_framework.response import Response
 from .serializers import UserSerializer
 import base64
 
 
-class UserViewSet(views.APIView):        
+class UserView(views.APIView):        
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -14,7 +14,7 @@ class UserViewSet(views.APIView):
         return Response(serializer.errors, status=400)
 
 
-class LoginViewSet(views.APIView):
+class LoginView(views.APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
