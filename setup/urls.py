@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib import admin
-from users.views import UserView, LoginView
+from rest_framework.authtoken import views
+from users.views import UserView
 from decks.views import (
     DecksView, 
     DeckView, 
@@ -20,7 +21,7 @@ from summaries.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', UserView.as_view(),),
-    path('api/login/', LoginView.as_view()),
+    path('api/login/', views.obtain_auth_token),
     path('api/decks/', DecksView.as_view()),
     path('api/decks/<int:id>/', DeckView.as_view()),
     path('api/decks/<int:id>/flashcards/', FlashCardsView.as_view()),
