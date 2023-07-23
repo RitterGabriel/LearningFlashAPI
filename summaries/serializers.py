@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Audio, Summary, SummaryGender, Phrase
+from .models import Author, Summary, SummaryGender, Phrase
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -7,12 +7,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = Author
         fields = '__all__'
         extra_kwargs = {'id': {'read_only': True}}
-
-
-class AudioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Audio
-        fields = ['audio_name', 'audio_content']
 
 
 class CreateSummarySerializer(serializers.ModelSerializer):
@@ -24,6 +18,7 @@ class CreateSummarySerializer(serializers.ModelSerializer):
 class SummariesSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source='author.author_name', read_only=True)
     gender = serializers.CharField(source='gender.gender_name', read_only=True)
+
     class Meta:
         model = Summary
         fields = 'id', 'title', 'author', 'gender',
@@ -32,6 +27,7 @@ class SummariesSerializer(serializers.ModelSerializer):
 class SummarySerializer(serializers.ModelSerializer):
     author = serializers.CharField(source='author.author_name', read_only=True)
     gender = serializers.CharField(source='gender.gender_name', read_only=True)
+
     class Meta:
         model = Summary
         fields = '__all__'

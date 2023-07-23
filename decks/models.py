@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import Account
 
 
 class Deck(models.Model):
     name = models.CharField(max_length=40, null=False)
     description = models.TextField(null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
 
 
 class FlashCard(models.Model):

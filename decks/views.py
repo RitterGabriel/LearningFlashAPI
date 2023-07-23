@@ -1,11 +1,9 @@
 from rest_framework import views
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import permissions
 from setup.permission import IsDeckOwner
 from .models import Deck, FlashCard
 from .serializers import DeckSerializer, FlashCardSerializer
-from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
 import pytz

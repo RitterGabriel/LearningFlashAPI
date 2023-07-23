@@ -26,14 +26,6 @@ class Summary(models.Model):
         return self.title
 
 
-class Audio(models.Model):
-    audio_name = models.CharField(max_length=255, unique=True, null=False)
-    audio_content = models.FileField(upload_to='audio_files/')
-
-    def __str__(self):
-        return self.audio_name
-
-
 class Phrase(models.Model):
     phrase = models.CharField(max_length=255, null=False, unique=True)
     translated_phrase = models.CharField(max_length=255, null=False)
