@@ -74,12 +74,16 @@ class SummaryGenderView(views.APIView):
 class PhraseView(views.APIView):
     def get(self, request, phrase):
         query = ' '.join(phrase.split()).lower()
-        phrases = Phrase.objects.filter(phrase=query)
-        if len(phrases) > 0:
-            translated_phrase = phrases[0].translated_phrase
+        sql = """
+            SELECT * FROM public.summaries_phrase
+            WHERE LOWER(phrase) = %s 
+        """
+        phrases = Phrase.objects.raw(sql, [phrase])
+        if phrases:
+            phrase_obj, = phrases
             data = {
-                'phrase': phrase,
-                'translated_phrase': translated_phrase,
+                'phrase': phrase_obj.phrase,
+                'translated_phrase': phrase_obj.translated_phrase,
             }
             return Response(data, status=200)
-        return Response({'status': 404}, status=404)
+        return Response({'message': 'there\'s no translation for this phrase'}, status=404)

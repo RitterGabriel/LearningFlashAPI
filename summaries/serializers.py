@@ -38,9 +38,3 @@ class SummaryGenderSerializer(serializers.ModelSerializer):
         model = SummaryGender
         fields = '__all__'
         extra_kwargs = {'id': {'read_only': True}}
-
-
-class PhraseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Phrase
-        fields = '__all__'
