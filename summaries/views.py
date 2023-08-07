@@ -43,7 +43,19 @@ class SummariesView(views.APIView):
         return Response(serializer.errors, status=400)
     
     def get(self, request):
-        queryset = Summary.objects.all()
+
+        query_filter = request.GET.get('filter')
+        if query_filter is None:
+            query_filter = ''
+        else:
+            query_filter = ''.join(query_filter.lower().split())
+
+        sql = """
+            SELECT * FROM public.summaries_summary
+            WHERE LOWER(REPLACE(title, ' ', '')) LIKE %s 
+        """
+
+        queryset = Summary.objects.raw(sql, params=[f'%{query_filter}%'])
         serializer = SummariesSerializer(queryset, many=True)
         return Response(serializer.data, status=200)
 
@@ -73,12 +85,11 @@ class SummaryGenderView(views.APIView):
 
 class PhraseView(views.APIView):
     def get(self, request, phrase):
-        query = ' '.join(phrase.split()).lower()
         sql = """
             SELECT * FROM public.summaries_phrase
             WHERE LOWER(phrase) = %s 
         """
-        phrases = Phrase.objects.raw(sql, [phrase])
+        phrases = Phrase.objects.raw(sql, [phrase.lower()])
         if phrases:
             phrase_obj, = phrases
             data = {
