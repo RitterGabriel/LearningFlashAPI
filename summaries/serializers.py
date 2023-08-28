@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Summary, SummaryGender, Phrase
+from .models import Author, Summary, SummaryGender, Favorite
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -36,5 +36,12 @@ class SummarySerializer(serializers.ModelSerializer):
 class SummaryGenderSerializer(serializers.ModelSerializer):
     class Meta:
         model = SummaryGender
+        fields = '__all__'
+        extra_kwargs = {'id': {'read_only': True}}
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
         fields = '__all__'
         extra_kwargs = {'id': {'read_only': True}}

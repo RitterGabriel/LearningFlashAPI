@@ -6,14 +6,15 @@ from decks.views import (
     DecksView, 
     DeckView, 
     FlashCardsView, 
-    FlashCardView
+    FlashCardView,
 )
 from summaries.views import (
     SummaryView,
     SummariesView, 
     SummaryGenderView, 
     AuthorsView,
-    PhraseView
+    PhraseView,
+    FavoritesView,
 )
 
 
@@ -30,4 +31,5 @@ urlpatterns = [
     path('api/summary_genders/', SummaryGenderView.as_view()),
     path('api/authors/', AuthorsView.as_view()),
     path('api/phrases/<str:phrase>', PhraseView.as_view()),
+    path('api/favorites/', FavoritesView.as_view()),
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import Account
 
 
 class Author(models.Model):
@@ -32,3 +33,8 @@ class Phrase(models.Model):
 
     def __str__(self):
         return self.phrase
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(to=Account, on_delete=models.CASCADE, null=False)
+    summary = models.ForeignKey(to=Summary, on_delete=models.CASCADE, null=False)

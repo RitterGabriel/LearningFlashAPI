@@ -1,18 +1,21 @@
-from rest_framework import views 
+from rest_framework import views
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from setup.permission import OnlyAdminCanPost
 from summaries.models import (
     Author, 
     Summary,
     SummaryGender, 
-    Phrase
+    Phrase,
+    Favorite,
 )
 from summaries.serializers import (
     AuthorSerializer,
     SummarySerializer,
-    SummariesSerializer, 
+    SummariesSerializer,
     CreateSummarySerializer, 
-    SummaryGenderSerializer, 
+    SummaryGenderSerializer,
+    FavoriteSerializer,
 )
 
 
@@ -98,3 +101,21 @@ class PhraseView(views.APIView):
             }
             return Response(data, status=200)
         return Response({'message': 'there\'s no translation for this phrase'}, status=404)
+
+
+class FavoritesView(views.APIView):
+    permission_classes = IsAuthenticated,
+
+    def get(self, request):
+        favorites = Favorite.objects.select_related('summary').filter(user=request.user.id)
+        serializer = SummariesSerializer([favorite.summary for favorite in favorites], many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        request.data['user'] = request.user.id
+        serializer = FavoriteSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
