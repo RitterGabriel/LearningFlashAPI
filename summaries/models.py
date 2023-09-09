@@ -22,6 +22,7 @@ class Summary(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     gender = models.ForeignKey(SummaryGender, on_delete=models.CASCADE)
     text_content = models.TextField(null=False)
+    image = models.ImageField(upload_to='book-images', null=False)
 
     def __str__(self):
         return self.title

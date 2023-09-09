@@ -1,5 +1,7 @@
 from django.urls import path
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework.authtoken.views import obtain_auth_token
 from users.views import UserView
 from decks.views import (
@@ -32,4 +34,4 @@ urlpatterns = [
     path('api/authors/', AuthorsView.as_view()),
     path('api/phrases/<str:phrase>', PhraseView.as_view()),
     path('api/favorites/', FavoritesView.as_view()),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

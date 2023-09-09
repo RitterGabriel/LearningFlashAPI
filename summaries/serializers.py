@@ -21,7 +21,7 @@ class SummariesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Summary
-        fields = 'id', 'title', 'author', 'gender',
+        fields = 'id', 'title', 'author', 'gender', 'image'
 
 
 class SummarySerializer(serializers.ModelSerializer):

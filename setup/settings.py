@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +47,9 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'setup.urls'
 
