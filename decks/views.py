@@ -106,4 +106,4 @@ class FlashCardView(views.APIView):
     def delete(self, request, id_):
         flash_card = FlashCard.objects.filter(id=id_) 
         flash_card.delete()
-        return Response(data={'status': 'deletado com sucesso'}, status=204)
+        return Response({'status': 'deletado com sucesso'}, status=200)

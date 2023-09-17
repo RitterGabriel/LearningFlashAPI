@@ -25,12 +25,12 @@ class SummariesSerializer(serializers.ModelSerializer):
 
 
 class SummarySerializer(serializers.ModelSerializer):
-    author = serializers.CharField(source='author.author_name', read_only=True)
-    gender = serializers.CharField(source='gender.gender_name', read_only=True)
+    author_name = serializers.CharField()
+    is_favorite = serializers.BooleanField()
 
     class Meta:
         model = Summary
-        fields = '__all__'
+        fields = 'id', 'author_name', 'title', 'text_content', 'is_favorite'
 
 
 class SummaryGenderSerializer(serializers.ModelSerializer):

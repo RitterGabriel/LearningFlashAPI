@@ -39,3 +39,6 @@ class Phrase(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(to=Account, on_delete=models.CASCADE, null=False)
     summary = models.ForeignKey(to=Summary, on_delete=models.CASCADE, null=False)
+
+    class Meta:
+        unique_together = 'user', 'summary'
