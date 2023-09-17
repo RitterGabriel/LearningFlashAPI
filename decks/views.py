@@ -1,16 +1,16 @@
 from rest_framework import views
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 from setup.permission import IsDeckOwner
 from .models import Deck, FlashCard
 from .serializers import DeckSerializer, FlashCardSerializer
-from datetime import datetime
+from datetime import datetime, date
 from dateutil import parser
 import pytz
 
 
 class DeckView(views.APIView):
-    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
+    permission_classes = IsDeckOwner, IsAuthenticated
     
     def get(self, request, id):
         deck = Deck.objects.get(id=id)
@@ -25,7 +25,7 @@ class DeckView(views.APIView):
 
 
 class DecksView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = IsAuthenticated,
     
     def get(self, request):
         decks = Deck.objects.filter(user=request.user)
@@ -43,25 +43,18 @@ class DecksView(views.APIView):
     
 
 class FlashCardsView(views.APIView):
-    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
-    
-    @staticmethod
-    def must_show_flashcard(flashcard):
-        last_time_checked = parser.parse(str(flashcard.last_time_checked)).replace(tzinfo=pytz.utc)
-        datetime_variation = datetime.now(pytz.utc) - last_time_checked
-        if flashcard.domain_level ** 2 <= datetime_variation.days:
-            print(datetime_variation.days)
-        return flashcard.domain_level ** 2 <= datetime_variation.days
+    permission_classes = IsDeckOwner, IsAuthenticated
 
     def get(self, request, id):
         decks = Deck.objects.filter(id=id)
-        if len(decks) > 0:
-            deck = decks[0]
+        if decks:
+            deck, = decks
             self.check_object_permissions(request, deck)
             if request.GET.get('get_all') == 'false':
-                flashcards = [flashcard for flashcard in FlashCard.objects.filter(deck=deck) if self.must_show_flashcard(flashcard)]
+                flashcards = self._filter_flashcards_that_must_be_showed(FlashCard.objects.filter(deck=deck))
             else:
-                flashcards = FlashCard.objects.filter(deck=deck)
+                flashcards = [self._add_days_to_appear_to_flashcard(flashcard)
+                              for flashcard in FlashCard.objects.filter(deck=deck)]
             serializer = FlashCardSerializer(flashcards, many=True)
             return Response(serializer.data, status=200)
         return Response({'status': '404'}, status=404)
@@ -80,9 +73,30 @@ class FlashCardsView(views.APIView):
             return Response(serializer.errors, status=400)
         return Response({'status': '404'}, status=404)
 
+    def _get_days_to_appear_amount(self, flashcard):
+        last_time_checked_date = flashcard.last_time_checked.date()
+        passed_days = (date.today() - last_time_checked_date).days
+        days_to_appear = 2 ** flashcard.domain_level - passed_days if flashcard.domain_level > 0 else 0
+        return days_to_appear if days_to_appear > 0 else 0
+
+    def _add_days_to_appear_to_flashcard(self, flashcard):
+        days_to_appear = self._get_days_to_appear_amount(flashcard)
+        flashcard.days_to_appear = days_to_appear
+        return flashcard
+
+    def _filter_flashcards_that_must_be_showed(self, flashcards):
+        filtered_flashcards = []
+        for flashcard in flashcards:
+            flashcard = self._add_days_to_appear_to_flashcard(flashcard)
+            if flashcard.days_to_appear == 0:
+                filtered_flashcards.append(flashcard)
+        return filtered_flashcards
+
+
+
 
 class FlashCardView(views.APIView):
-    permission_classes = [IsDeckOwner, permissions.IsAuthenticated]
+    permission_classes = IsDeckOwner, IsAuthenticated
     
     def put(self, request, id_):
         has_good_domain_level = request.data.get('has_good_domain_level')
