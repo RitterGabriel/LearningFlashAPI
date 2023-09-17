@@ -1,15 +1,13 @@
-from rest_framework import views
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from setup.permission import IsDeckOwner
 from .models import Deck, FlashCard
 from .serializers import DeckSerializer, FlashCardSerializer
-from datetime import datetime, date
-from dateutil import parser
-import pytz
+from datetime import date
 
 
-class DeckView(views.APIView):
+class DeckView(APIView):
     permission_classes = IsDeckOwner, IsAuthenticated
     
     def get(self, request, id):
@@ -24,7 +22,7 @@ class DeckView(views.APIView):
         return Response(data={'status': 'deletado com sucesso'}, status=204)
 
 
-class DecksView(views.APIView):
+class DecksView(APIView):
     permission_classes = IsAuthenticated,
     
     def get(self, request):
@@ -42,7 +40,7 @@ class DecksView(views.APIView):
         return Response(serializer.errors, status=400)
     
 
-class FlashCardsView(views.APIView):
+class FlashCardsView(APIView):
     permission_classes = IsDeckOwner, IsAuthenticated
 
     def get(self, request, id):
@@ -93,9 +91,7 @@ class FlashCardsView(views.APIView):
         return filtered_flashcards
 
 
-
-
-class FlashCardView(views.APIView):
+class FlashCardView(APIView):
     permission_classes = IsDeckOwner, IsAuthenticated
     
     def put(self, request, id_):

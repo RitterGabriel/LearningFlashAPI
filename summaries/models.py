@@ -9,12 +9,18 @@ class Author(models.Model):
     def __str__(self):
         return self.author_name
 
+    class Meta:
+        db_table = 'authors'
+
 
 class SummaryGender(models.Model):
     gender_name = models.CharField(max_length=120, null=False)
 
     def __str__(self):
         return self.gender_name
+
+    class Meta:
+        db_table = 'summaries_genders'
 
 
 class Summary(models.Model):
@@ -27,6 +33,9 @@ class Summary(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        db_table = 'summaries'
+
 
 class Phrase(models.Model):
     phrase = models.CharField(max_length=255, null=False, unique=True)
@@ -35,10 +44,14 @@ class Phrase(models.Model):
     def __str__(self):
         return self.phrase
 
+    class Meta:
+        db_table = 'phrases'
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(to=Account, on_delete=models.CASCADE, null=False)
     summary = models.ForeignKey(to=Summary, on_delete=models.CASCADE, null=False)
 
     class Meta:
+        db_table = 'favorites'
         unique_together = 'user', 'summary'

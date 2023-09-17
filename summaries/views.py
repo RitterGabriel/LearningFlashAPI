@@ -1,4 +1,4 @@
-from rest_framework import views
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from setup.permission import OnlyAdminCanPost
@@ -19,7 +19,7 @@ from summaries.serializers import (
 )
 
 
-class AuthorsView(views.APIView):
+class AuthorsView(APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def get(self, request):
@@ -35,7 +35,7 @@ class AuthorsView(views.APIView):
         return Response(serializer.errors, status=400)
 
 
-class SummariesView(views.APIView):
+class SummariesView(APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def post(self, request):
@@ -54,7 +54,7 @@ class SummariesView(views.APIView):
             query_filter = ''.join(query_filter.lower().split())
 
         sql = """
-            SELECT * FROM public.summaries_summary
+            SELECT * FROM public.summaries
             WHERE LOWER(REPLACE(title, ' ', '')) LIKE %s 
             ORDER BY id DESC
         """
@@ -64,7 +64,7 @@ class SummariesView(views.APIView):
         return Response(serializer.data, status=200)
 
 
-class SummaryView(views.APIView):
+class SummaryView(APIView):
     def get(self, request, id):
         query_result = self._fetch_summary(request.user.id, id)
         if not query_result:
@@ -75,21 +75,21 @@ class SummaryView(views.APIView):
 
     def _fetch_summary(self, user_id, book_id):
         sql = """
-            SELECT summaries_summary.id, title, text_content, author_name,
-            (SELECT count(*) = 1 FROM summaries_favorite WHERE user_id = %s AND summary_id = %s) as is_favorite
-            FROM public.summaries_summary
-            LEFT JOIN summaries_favorite
-            ON summaries_summary.id = summaries_favorite.summary_id
-            INNER JOIN summaries_author
-            ON summaries_summary.author_id = summaries_author.id
-            WHERE summaries_summary.id = %s
+            SELECT summaries.id, title, text_content, author_name,
+            (SELECT count(*) = 1 FROM favorites WHERE user_id = %s AND summary_id = %s) as is_favorite
+            FROM public.summaries
+            LEFT JOIN favorites
+            ON summaries.id = favorites.summary_id
+            INNER JOIN authors
+            ON summaries.author_id = authors.id
+            WHERE summaries.id = %s
             LIMIT 1
         """
         query_result = Summary.objects.raw(sql, [user_id, book_id, book_id])
         return tuple(query_result)
 
 
-class SummaryGenderView(views.APIView):
+class SummaryGenderView(APIView):
     permission_classes = [OnlyAdminCanPost]
 
     def post(self, request):
@@ -105,10 +105,10 @@ class SummaryGenderView(views.APIView):
         return Response(serializer.data, status=200)
 
 
-class PhraseView(views.APIView):
+class PhraseView(APIView):
     def get(self, request, phrase):
         sql = """
-            SELECT * FROM public.summaries_phrase
+            SELECT * FROM public.phrases
             WHERE LOWER(phrase) = %s 
         """
         phrases = Phrase.objects.raw(sql, [phrase.lower()])
@@ -122,7 +122,7 @@ class PhraseView(views.APIView):
         return Response({'message': 'there\'s no translation for this phrase'}, status=404)
 
 
-class FavoritesView(views.APIView):
+class FavoritesView(APIView):
     permission_classes = IsAuthenticated,
 
     def get(self, request):

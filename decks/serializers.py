@@ -14,4 +14,3 @@ class FlashCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = FlashCard
         fields = 'id', 'phrase', 'translated_phrase', 'last_time_checked', 'domain_level', 'deck', 'days_to_appear'
-    
