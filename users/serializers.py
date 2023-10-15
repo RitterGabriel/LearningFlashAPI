@@ -6,7 +6,7 @@ from .models import Account
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['id', 'username', 'password', 'email']
+        fields = 'id', 'username', 'password', 'email'
 
     def validate_password(self, value):
         password_validation.validate_password(value)
